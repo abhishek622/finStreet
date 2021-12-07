@@ -34,7 +34,6 @@ export default function Dashboard() {
 
 	const openInPopup = (item) => {
 		setRecordForEdit(item);
-		console.log(item);
 		setOpenE(true);
 	};
 
@@ -57,7 +56,7 @@ export default function Dashboard() {
 
 	const createRow = async (data) => {
 		await axios
-			.post("http://localhost:5000/user/create", values)
+			.post("http://localhost:5000/user/create", data)
 			.then((res) => {
 				console.log(res);
 				getRows();
@@ -142,12 +141,14 @@ export default function Dashboard() {
 				handleClose={() => setOpenPopup(false)}
 				createRow={createRow}
 			/>
-			<EditModal
-				openE={openE}
-				handleCloseE={() => setOpenE(false)}
-				updateRow={updateRow}
-				row={recordForEdit}
-			/>
+			{recordForEdit != null && (
+				<EditModal
+					openE={openE}
+					handleCloseE={() => setOpenE(false)}
+					updateRow={updateRow}
+					row={recordForEdit}
+				/>
+			)}
 		</div>
 	);
 }

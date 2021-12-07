@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Box,
 	Modal,
@@ -35,9 +35,11 @@ export default function EditModal({ openE, handleCloseE, row, updateRow }) {
 			user_password: values.user_password,
 			total_orders: values.total_orders,
 		});
-
-		console.log(values);
 	};
+
+	useEffect(() => {
+		setValues(row);
+	}, [row]);
 
 	return (
 		<Modal
