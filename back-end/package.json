@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "make-model": "npx sequelize-cli model:generate --name User --attributes user_name:string, user_email:string, user_password:string,user_image:string, total_orders:integer, last_logged_in:date",
+    "make-admin": "npx sequelize-cli model:generate --name Admin --attributes admin_name:string",
     "make-seed": "npx sequelize-cli seed:generate --name demo-user",
     "seed": "npx sequelize-cli db:seed:all",
     "migrate": "npx sequelize-cli db:migrate",

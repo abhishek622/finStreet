@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { makeStyles } from "@mui/styles";
-
+import axios from "axios";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 
 const useStyles = makeStyles({
@@ -20,15 +20,43 @@ const useStyles = makeStyles({
 });
 
 const initialValues = {
-	username: "",
-	password: "",
+	admin_name: "",
+	admin_password: "",
+};
+
+const initialErrors = {
+	name_error: "",
+	password_error: "",
 };
 
 export default function Login(props) {
 	let navigate = useNavigate();
-	let location = useLocation();
 	const classes = useStyles();
 	const [values, setValues] = useState(initialValues);
+	const [error, setError] = useState(initialErrors);
+
+	const getToken = async (values) => {
+		const { admin_name, admin_password } = values;
+		const res = await axios.get(
+			`http://localhost:5000/admin/login/${admin_name}/`
+		);
+		if (res.data.admin_name === admin_name) {
+			if (res.data.admin_password === admin_password) {
+				localStorage.setItem("token", res.data.token);
+				navigate("/board");
+			} else {
+				setError({
+					...error,
+					password_error: "Password is incorrect",
+				});
+			}
+		} else {
+			setError({
+				...error,
+				name_error: "User name is incorrect",
+			});
+		}
+	};
 
 	const handleChange = (event) => {
 		setValues({
@@ -39,8 +67,7 @@ export default function Login(props) {
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		navigate("/board");
-		console.log(values);
+		getToken(values);
 	};
 
 	return (
@@ -64,24 +91,26 @@ export default function Login(props) {
 						margin="normal"
 						required
 						fullWidth
-						id="username"
 						label="User name"
-						name="username"
-						value={values.username}
+						name="admin_name"
+						value={values.admin_name}
 						onChange={handleChange}
 						autoComplete="username"
+						error={error.name_error ? true : false}
+						helperText={error.name_error}
 					/>
 					<TextField
 						margin="normal"
 						required
 						fullWidth
-						name="password"
+						name="admin_password"
 						label="Password"
 						type="password"
-						id="password"
-						value={values.password}
+						value={values.admin_password}
 						onChange={handleChange}
 						autoComplete="current-password"
+						error={error.password_error ? true : false}
+						helperText={error.password_error}
 					/>
 					<Button
 						type="submit"

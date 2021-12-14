@@ -7,6 +7,7 @@ import {
 	TableCell,
 	TableRow,
 	Typography,
+	IconButton,
 } from "@mui/material";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -15,11 +16,14 @@ import CreateModal from "../components/CreateModal";
 import axios from "axios";
 import EditModal from "../components/EditModal";
 import UseTable from "../components/UseTable";
+import LogoutIcon from "@mui/icons-material/Logout";
 import {
 	ActionButton,
 	ConfirmDialog,
 	Notification,
 } from "../components/controls";
+
+import { Link as RouterLink } from "react-router-dom";
 
 export default function Dashboard() {
 	const [rows, setRows] = useState(d_rows);
@@ -82,16 +86,26 @@ export default function Dashboard() {
 				}}
 			>
 				<Typography variant="h6">FinStreet Dashboard</Typography>
-
-				<Button
-					variant="contained"
-					color="primary"
-					onClick={() => {
-						setOpenPopup(true);
-					}}
-				>
-					Create
-				</Button>
+				<div>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={() => {
+							setOpenPopup(true);
+						}}
+					>
+						Create
+					</Button>
+					<IconButton
+						color="primary"
+						component="span"
+						component={RouterLink}
+						to="/"
+						style={{ marginLeft: 20 }}
+					>
+						<LogoutIcon />
+					</IconButton>
+				</div>
 			</Paper>
 			<Paper>
 				<TblContainer>

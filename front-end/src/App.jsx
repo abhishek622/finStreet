@@ -15,10 +15,12 @@ function App() {
 	return (
 		<ThemeProvider theme={theme}>
 			<Routes>
-				<Route path="/" element={<Login />} />
-				<Route path="/signup" element={<SignUp />} />
-				{/* <Route path="*" element={<NoMatch />} /> */}
-				<Route path="/board" element={<Dashboard />} />
+				<Route path="/">
+					<Route index element={<Login />} />
+					<Route path="/signup" element={<SignUp />} />
+					{/* <Route path="*" element={<NoMatch />} /> */}
+					<Route path="/board" element={<Dashboard />} />
+				</Route>
 			</Routes>
 		</ThemeProvider>
 	);

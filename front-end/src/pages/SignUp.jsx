@@ -11,6 +11,7 @@ import {
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import { makeStyles } from "@mui/styles";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
 const useStyles = makeStyles({
 	align: {
@@ -19,14 +20,13 @@ const useStyles = makeStyles({
 });
 
 const initialValues = {
-	email: "",
-	username: "",
-	password: "",
+	admin_email: "",
+	admin_name: "",
+	admin_password: "",
 };
 
 export default function SignUp() {
 	let navigate = useNavigate();
-	let location = useLocation();
 	const classes = useStyles();
 	const [values, setValues] = useState(initialValues);
 
@@ -35,10 +35,18 @@ export default function SignUp() {
 		setValues({ ...values, [name]: value });
 	};
 
+	const createAccount = async () => {
+		const res = await axios.post("http://localhost:5000/admin/create", values);
+		if (res.status === 201) {
+			navigate("/");
+		} else {
+			console.log(res.status);
+		}
+	};
+
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		navigate("/");
-		console.log(values);
+		createAccount();
 	};
 
 	return (
@@ -62,10 +70,9 @@ export default function SignUp() {
 						margin="normal"
 						required
 						fullWidth
-						id="username"
 						label="User Name"
-						name="username"
-						value={values.username}
+						name="admin_name"
+						value={values.admin_name}
 						onChange={handleChange}
 						autoComplete="username"
 					/>
@@ -73,10 +80,9 @@ export default function SignUp() {
 						margin="normal"
 						required
 						fullWidth
-						id="email"
 						label="Email Address"
-						name="email"
-						value={values.email}
+						name="admin_email"
+						value={values.admin_email}
 						onChange={handleChange}
 						autoComplete="email"
 					/>
@@ -84,11 +90,10 @@ export default function SignUp() {
 						margin="normal"
 						required
 						fullWidth
-						name="password"
+						name="admin_password"
 						label="Password"
 						type="password"
-						id="password"
-						value={values.password}
+						value={values.admin_password}
 						onChange={handleChange}
 						autoComplete="current-password"
 					/>
