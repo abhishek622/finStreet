@@ -5,14 +5,19 @@ const Admin = require("../models").Admin;
 
 const router = express.Router();
 
-const createToken = (admin, secret) => {
-	return jwt.sign(admin.id, secret);
-};
-
 const listAdmins = router.get("/list", async (req, res) => {
 	try {
 		const admins = await Admin.findAll();
 		res.status(200).send(admins);
+	} catch (error) {
+		res.status(500).send(error);
+	}
+});
+
+const getAdminById = router.get("/:id", async (req, res) => {
+	try {
+		const admin = await Admin.findByPk(req.params.id);
+		res.status(200).send(admin);
 	} catch (error) {
 		res.status(500).send(error);
 	}
@@ -36,11 +41,8 @@ const loginAdmin = router.post("/login", async (req, res) => {
 				message: "Invalid email or password.",
 			});
 		}
-		const token = createToken(admin, process.env.JWT_SECRET);
-		res.status(200).send({
-			admin,
-			token,
-		});
+		const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET);
+		res.status(200).send({ token });
 	} catch (error) {
 		res.status(500).send(error);
 	}
@@ -94,4 +96,5 @@ module.exports = {
 	loginAdmin,
 	register,
 	deleteAdmin,
+	getAdminById,
 };

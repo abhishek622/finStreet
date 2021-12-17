@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import { makeStyles } from "@mui/styles";
-import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import AuthService from "../services/auth.service";
 
 const useStyles = makeStyles({
 	align: {
@@ -25,28 +25,68 @@ const initialValues = {
 	admin_password: "",
 };
 
+const initialErrors = {
+	err_email: "",
+	err_name: "",
+	err_password: "",
+	err_server: "",
+};
+
 export default function SignUp() {
 	let navigate = useNavigate();
 	const classes = useStyles();
 	const [values, setValues] = useState(initialValues);
+	const [error, setError] = useState(initialErrors);
+
+	const validate = () => {
+		let err = { ...initialErrors };
+		let valid = true;
+		if (values.admin_email === "") {
+			err.err_email = "Email is required";
+			valid = false;
+		} else if (
+			!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.admin_email)
+		) {
+			err.err_email = "Invalid email address";
+			valid = false;
+		}
+		if (values.admin_name === "") {
+			err.err_name = "Name is required";
+			valid = false;
+		}
+		if (values.admin_password === "") {
+			err.err_password = "Password is required";
+			valid = false;
+		} else if (values.admin_password.length < 6) {
+			err.err_password = "Password must be at least 6 characters long";
+			valid = false;
+		}
+		setError(err);
+		return valid;
+	};
 
 	const handleChange = (event) => {
 		const { name, value } = event.target;
 		setValues({ ...values, [name]: value });
 	};
 
-	const createAccount = async () => {
-		const res = await axios.post("http://localhost:5000/admin/create", values);
-		if (res.status === 201) {
-			navigate("/");
-		} else {
-			console.log(res.status);
-		}
-	};
-
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		createAccount();
+		if (validate()) {
+			AuthService.register(
+				values.admin_name,
+				values.admin_email,
+				values.admin_password
+			).then((res) => {
+				if (res) {
+					navigate("/");
+				} else {
+					setError({
+						err_server: "Admin already exists",
+					});
+				}
+			});
+		}
 	};
 
 	return (
@@ -75,6 +115,8 @@ export default function SignUp() {
 						value={values.admin_name}
 						onChange={handleChange}
 						autoComplete="username"
+						error={error.err_name !== ""}
+						helperText={error.err_name}
 					/>
 					<TextField
 						margin="normal"
@@ -85,6 +127,8 @@ export default function SignUp() {
 						value={values.admin_email}
 						onChange={handleChange}
 						autoComplete="email"
+						error={error.err_email !== ""}
+						helperText={error.err_email}
 					/>
 					<TextField
 						margin="normal"
@@ -96,7 +140,18 @@ export default function SignUp() {
 						value={values.admin_password}
 						onChange={handleChange}
 						autoComplete="current-password"
+						error={error.err_password !== ""}
+						helperText={error.err_password}
 					/>
+
+					{error.err_server !== "" && (
+						<Box sx={{ mt: 2 }}>
+							<Typography variant="body2" color="error">
+								{error.err_server}
+							</Typography>
+						</Box>
+					)}
+
 					<Button
 						type="submit"
 						fullWidth

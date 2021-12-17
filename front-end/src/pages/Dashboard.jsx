@@ -8,15 +8,18 @@ import {
 	TableRow,
 	Typography,
 	IconButton,
+	Box,
 } from "@mui/material";
 import DeleteForeverRoundedIcon from "@mui/icons-material/DeleteForeverRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { d_rows } from "../Data/dummy_rows";
 import CreateModal from "../components/CreateModal";
-import axios from "axios";
 import EditModal from "../components/EditModal";
 import UseTable from "../components/UseTable";
 import LogoutIcon from "@mui/icons-material/Logout";
+import jwt_decode from "jwt-decode";
+import Cookies from "js-cookie";
+
 import {
 	ActionButton,
 	ConfirmDialog,
@@ -25,52 +28,60 @@ import {
 
 import { Link as RouterLink } from "react-router-dom";
 
+import AuthService from "../services/auth.service";
+import userService from "../services/user.service";
+import AdminService from "../services/admin.service";
+
 export default function Dashboard() {
 	const [rows, setRows] = useState(d_rows);
 	const [recordForEdit, setRecordForEdit] = useState(null);
 	const [openPopup, setOpenPopup] = useState(false);
-
+	const [adminName, setAdminName] = useState("");
 	const { TblHead, TblPagination, TblContainer, recordsAfterPaging } =
 		UseTable(rows);
 
 	const [openE, setOpenE] = useState(false);
-	// get rows from database
 
 	const openInPopup = (item) => {
 		setRecordForEdit(item);
 		setOpenE(true);
 	};
 
-	const getRows = async () => {
-		const res = await axios.get("http://localhost:5000/user/");
-		setRows(res.data);
+	const getAdminName = () => {
+		const token = Cookies.get("token");
+		const decoded = jwt_decode(token);
+		const id = decoded.id;
+		AdminService.getAdminById(id).then((res) => {
+			setAdminName(res.admin_name);
+		});
 	};
 
-	// delete row from database
+	const getRows = async () => {
+		const rows = await userService.getAll();
+		setRows(rows);
+	};
+
 	const deleteRow = async (id) => {
-		await axios.delete(`http://localhost:5000/user/${id}`);
+		await userService.deleteById(id);
 		getRows();
 	};
 
-	// update row in database
 	const updateRow = async (id, data) => {
-		await axios.put(`http://localhost:5000/user/${id}`, data);
+		await userService.update(id, data);
 		getRows();
 	};
 
 	const createRow = async (data) => {
-		await axios
-			.post("http://localhost:5000/user/create", data)
-			.then((res) => {
-				console.log(res);
-				getRows();
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		await userService.create(data);
+		getRows();
+	};
+
+	const logout = async () => {
+		await AuthService.logout();
 	};
 
 	useEffect(() => {
+		getAdminName();
 		getRows();
 	}, []);
 
@@ -86,27 +97,36 @@ export default function Dashboard() {
 				}}
 			>
 				<Typography variant="h6">FinStreet Dashboard</Typography>
-				<div>
-					<Button
-						variant="contained"
-						color="primary"
-						onClick={() => {
-							setOpenPopup(true);
-						}}
-					>
-						Create
-					</Button>
-					<IconButton
-						color="primary"
-						component="span"
-						component={RouterLink}
-						to="/"
-						style={{ marginLeft: 20 }}
-					>
-						<LogoutIcon />
-					</IconButton>
-				</div>
+
+				<IconButton
+					color="primary"
+					component="span"
+					component={RouterLink}
+					to="/"
+					onClick={logout}
+				>
+					<LogoutIcon />
+				</IconButton>
 			</Paper>
+			<Box
+				style={{
+					marginBottom: 20,
+					alignItems: "center",
+					display: "flex",
+					justifyContent: "space-between",
+				}}
+			>
+				<Typography variant="h6">Welcome, {adminName}</Typography>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={() => {
+						setOpenPopup(true);
+					}}
+				>
+					Create
+				</Button>
+			</Box>
 			<Paper>
 				<TblContainer>
 					<TblHead />

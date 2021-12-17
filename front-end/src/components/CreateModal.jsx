@@ -39,7 +39,6 @@ export default function CreateModal({ open, handleClose, createRow }) {
 		event.preventDefault();
 		createRow(values);
 		handleClose();
-		console.log(values);
 	};
 
 	return (

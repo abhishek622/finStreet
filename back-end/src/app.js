@@ -17,7 +17,6 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Create a catch-all route for testing the installation.
 app.get("/", (req, res) =>
 	res.status(200).send({
 		message: "Hello World! 😎",
