@@ -11,7 +11,7 @@ export default function ConfirmCreate(props) {
 				horizontal: "center",
 			}}
 			open={isCreated}
-			autoHideDuration={6000}
+			autoHideDuration={3000}
 			onClose={() => setIsCreated(false)}
 		>
 			<Alert onClose={() => setIsCreated(false)} severity="success">

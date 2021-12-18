@@ -11,7 +11,7 @@ export default function ConfirmDelete(props) {
 				horizontal: "center",
 			}}
 			open={isDeleted}
-			autoHideDuration={6000}
+			autoHideDuration={3000}
 			onClose={() => setIsDeleted(false)}
 		>
 			<Alert onClose={() => setIsDeleted(false)} severity="error">
