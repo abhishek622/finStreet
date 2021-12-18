@@ -22,8 +22,8 @@ import Cookies from "js-cookie";
 
 import {
 	ActionButton,
-	ConfirmDialog,
-	Notification,
+	ConfirmCreate,
+	ConfirmDelete,
 } from "../components/controls";
 
 import { Link as RouterLink } from "react-router-dom";
@@ -31,6 +31,21 @@ import { Link as RouterLink } from "react-router-dom";
 import AuthService from "../services/auth.service";
 import userService from "../services/user.service";
 import AdminService from "../services/admin.service";
+
+const getDateTime = (timestamp) => {
+	const date = new Date(timestamp);
+	const dateTime =
+		date.getDate() +
+		"/" +
+		date.getMonth() +
+		"/" +
+		date.getFullYear() +
+		" " +
+		date.getHours() +
+		":" +
+		date.getMinutes().toString().padStart(2, "0");
+	return dateTime;
+};
 
 export default function Dashboard() {
 	const [rows, setRows] = useState(d_rows);
@@ -41,6 +56,8 @@ export default function Dashboard() {
 		UseTable(rows);
 
 	const [openE, setOpenE] = useState(false);
+	const [isCreated, setIsCreated] = useState(false);
+	const [isDeleted, setIsDeleted] = useState(false);
 
 	const openInPopup = (item) => {
 		setRecordForEdit(item);
@@ -64,6 +81,7 @@ export default function Dashboard() {
 	const deleteRow = async (id) => {
 		await userService.deleteById(id);
 		getRows();
+		setIsDeleted(true);
 	};
 
 	const updateRow = async (id, data) => {
@@ -114,9 +132,21 @@ export default function Dashboard() {
 					alignItems: "center",
 					display: "flex",
 					justifyContent: "space-between",
+					paddingLeft: 12,
+					paddingRight: 12,
 				}}
 			>
-				<Typography variant="h6">Welcome, {adminName}</Typography>
+				<Typography
+					variant="h5"
+					style={{
+						fontWeight: "bold",
+						color: "#3f51b5",
+					}}
+				>
+					Welcome,{" "}
+					{adminName != "" &&
+						adminName.charAt(0).toUpperCase() + adminName.slice(1)}
+				</Typography>
 				<Button
 					variant="contained"
 					color="primary"
@@ -141,7 +171,9 @@ export default function Dashboard() {
 									<TableCell align="center">{row.user_email}</TableCell>
 									<TableCell align="center">{row.user_password}</TableCell>
 									<TableCell align="center">{row.total_orders}</TableCell>
-									<TableCell align="center">{row.createdAt}</TableCell>
+									<TableCell align="center">
+										{getDateTime(row.createdAt)}
+									</TableCell>
 									<TableCell align="center">
 										<ActionButton
 											color="primary"
@@ -174,6 +206,7 @@ export default function Dashboard() {
 				open={openPopup}
 				handleClose={() => setOpenPopup(false)}
 				createRow={createRow}
+				setIsCreated={setIsCreated}
 			/>
 			{recordForEdit != null && (
 				<EditModal
@@ -183,6 +216,8 @@ export default function Dashboard() {
 					row={recordForEdit}
 				/>
 			)}
+			<ConfirmCreate isCreated={isCreated} setIsCreated={setIsCreated} />
+			<ConfirmDelete isDeleted={isDeleted} setIsDeleted={setIsDeleted} />
 		</div>
 	);
 }

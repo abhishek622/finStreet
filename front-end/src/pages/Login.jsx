@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
 	Avatar,
 	TextField,
@@ -7,10 +7,9 @@ import {
 	Typography,
 	Container,
 	Snackbar,
-	IconButton,
 	Button,
+	Alert,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { makeStyles } from "@mui/styles";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -53,15 +52,15 @@ export default function Login(props) {
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		setLoading(true);
-		AuthService.login(values.admin_email, values.admin_password).then((res) => {
-			if (res) {
+		AuthService.login(values)
+			.then((res) => {
 				setLoading(false);
 				navigate("/board");
-			} else {
+			})
+			.catch((err) => {
 				setLoading(false);
-				setError("Invalid email or password");
-			}
-		});
+				setError(err.response.data.message);
+			});
 	};
 
 	return (
@@ -125,6 +124,7 @@ export default function Login(props) {
 					</Box>
 				</Box>
 			</Box>
+
 			<Snackbar
 				anchorOrigin={{
 					vertical: "bottom",
@@ -133,20 +133,11 @@ export default function Login(props) {
 				open={error.length > 0}
 				autoHideDuration={6000}
 				onClose={handleClose}
-				message={error}
-				action={
-					<React.Fragment>
-						<IconButton
-							size="small"
-							aria-label="close"
-							color="inherit"
-							onClick={handleClose}
-						>
-							<CloseIcon fontSize="small" />
-						</IconButton>
-					</React.Fragment>
-				}
-			/>
+			>
+				<Alert onClose={handleClose} severity="error">
+					{error}
+				</Alert>
+			</Snackbar>
 		</Container>
 	);
 }

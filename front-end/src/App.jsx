@@ -1,8 +1,9 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Dashboard, Login, SignUp } from "./pages";
+import { Dashboard, Login, SignUp, Error } from "./pages";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { orange } from "@mui/material/colors";
+import PrivateRoute from "../src/components/ProtectedRoute";
 
 const theme = createTheme({
 	palette: {
@@ -15,12 +16,17 @@ function App() {
 	return (
 		<ThemeProvider theme={theme}>
 			<Routes>
-				<Route path="/">
-					<Route index element={<Login />} />
-					<Route path="/signup" element={<SignUp />} />
-					{/* <Route path="*" element={<NoMatch />} /> */}
-					<Route path="/board" element={<Dashboard />} />
-				</Route>
+				<Route path="/" element={<Login />} />
+				<Route path="/signup" element={<SignUp />} />
+				<Route
+					path="/board"
+					element={
+						<PrivateRoute>
+							<Dashboard />
+						</PrivateRoute>
+					}
+				/>
+				<Route path="*" element={<Error />} />
 			</Routes>
 		</ThemeProvider>
 	);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Box,
 	Modal,
@@ -27,7 +27,12 @@ const initialValues = {
 	user_image: "",
 };
 
-export default function CreateModal({ open, handleClose, createRow }) {
+export default function CreateModal({
+	open,
+	handleClose,
+	createRow,
+	setIsCreated,
+}) {
 	const [values, setValues] = useState(initialValues);
 
 	const handleInputChange = (event) => {
@@ -39,7 +44,12 @@ export default function CreateModal({ open, handleClose, createRow }) {
 		event.preventDefault();
 		createRow(values);
 		handleClose();
+		setIsCreated(true);
 	};
+
+	useEffect(() => {
+		setValues(initialValues);
+	}, [open]);
 
 	return (
 		<Modal
